@@ -6,7 +6,7 @@ const BarGraphComponent = () => {
   const [projectData, setProjectData] = useState([]);
 
   useEffect(() => {
-    axios.get('https://employeelogin.vercel.app/auth/get_employee_projects')
+    axios.get('https://employeelogin.vercel.app/auth/project_time_data')
       .then(response => {
         setProjectData(response.data);
       })

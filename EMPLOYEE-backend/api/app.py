@@ -1,7 +1,6 @@
 """
 Import Libraries
 """
-
 from flask import Flask, jsonify, request, session, redirect, url_for
 from flask_cors import CORS
 from flask_mail import Mail, Message
@@ -22,7 +21,6 @@ import random
 """
 Database Setup
 """
-
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -196,7 +194,6 @@ initialize_db()
 """
 Start
 """
-
 @app.route('/')
 def home():
     return redirect(url_for('admin.index'))
@@ -331,9 +328,8 @@ def login():
         return jsonify({'loginStatus': False, 'Error': 'Invalid credentials'}), 401
 
 """
-Meeting Details
+Dashboard Page - Meeting Details
 """
-
 @app.route('/auth/meetings', methods=['GET'])
 def get_meetings():
     # Query the MongoDB collection to fetch all meetings
@@ -358,9 +354,8 @@ def get_meetings():
 
 
 """
-Show Employee Details on Profile Page
+Profile Page - Show Employee Details
 """
-
 @app.route('/auth/employee', methods=['GET'])
 def get_employee_data():
     if 'logged_in' not in session or not session['logged_in']:
@@ -380,9 +375,8 @@ def get_employee_data():
 
 
 """
-Update Employee Profile Page
+ Profile Page - Update Employee Details
 """
-
 @app.route('/auth/update_employee', methods=['POST'])
 def update_employee():
     data = request.json
@@ -432,9 +426,8 @@ def upload_profile_image():
     return jsonify({'error': 'File format not allowed'}), 400
 
 """
-Leave
+Leave Page
 """
-
 @app.route('/auth/leave', methods=['POST'])
 def add_leave():
     data = request.json
@@ -457,17 +450,8 @@ def add_leave():
     return jsonify({'message': 'Leave added successfully'}), 200
 
 
-@app.route('/auth/project_data', methods=['GET'])
-def get_project_data():
-    projects = db.project_list.find()
-    project_list = []
-    for project in projects:
-        project_dict = {'name': project['name']}
-        project_list.append(project_dict)
-    return jsonify({'Status': True, 'Result': project_list}), 200
-
 """
-Events on Calendar 
+Calendar Page - Events
 """
 
 @app.route('/auth/add_event', methods=['POST'])
@@ -519,9 +503,8 @@ def get_events():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 """
-
+TimeTracker - To show available projects list in dropdown 
 """
-
 @app.route('/auth/get_projects', methods=['GET'])
 def get_projects():
     try:
@@ -533,9 +516,8 @@ def get_projects():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 """
-Add Project To Databaase from Time Tracker Page 
+TimeTracker - Add Project To Databaase
 """
-
 @app.route('/auth/add_project_data', methods=['POST'])
 def add_project_data():
     print(f'Session contents: {session}')
@@ -571,7 +553,21 @@ def add_project_data():
         return jsonify({'error': 'Failed to add project data.'}), 500
 
 """
-To Update Project - Start / Resume and update in database 
+TimeTracker - Display worked project details
+"""
+@app.route('/auth/get_employee_projects', methods=['GET'])
+def get_employee_projects():
+    if 'empid' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    empid = session['empid']
+    projects = db.projects.find({'empid': empid})
+    project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
+
+    return jsonify({'projects': project_list}), 200
+
+"""
+TimeTracker Page - To Update Project - Start / Resume and update in database 
 """
 @app.route('/auth/update_project_data/<index>', methods=['POST'])
 def update_project_data(index):
@@ -592,31 +588,47 @@ def update_project_data(index):
     else:
         return jsonify({'error': 'Failed to update project data.'}), 500
 
-
 """
 Report Page - Pie Chart and Bar Graph
 """
-@app.route('/auth/tag_list', methods=['GET'])
-def get_tag_list():
-    tags = db.tag_list.find({}, {'_id': 0, 'tag': 1})
-    tags_list = [{'tag': tag['tag']} for tag in tags]
-    return jsonify({'tags': tags_list})
+@app.route('/auth/project_time', methods=['GET'])
+def get_project_time():
+    try:
+        projects = db.projects.aggregate([
+            {
+                "$group": {
+                    "_id": "$projectName",
+                    "totalTime": {"$sum": "$timeElapsed"}
+                }
+            }
+        ])
+        project_list = [{"projectName": project["_id"], "totalTime": project["totalTime"]} for project in projects]
+        return jsonify(project_list), 200
+    except Exception as e:
+        print(f"Error fetching project times: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
-@app.route('/auth/get_employee_projects', methods=['GET'])
-def get_employee_projects():
-    if 'empid' not in session:
-        return jsonify({'error': 'Not logged in'}), 401
-
-    empid = session['empid']
-    projects = db.projects.find({'empid': empid})
-    project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
-
-    return jsonify({'projects': project_list}), 200
+@app.route('/auth/tag_count', methods=['GET'])
+def get_tag_count():
+    try:
+        tags = db.projects.aggregate([
+            {"$unwind": "$tags"},
+            {
+                "$group": {
+                    "_id": "$tags",
+                    "count": {"$sum": 1}
+                }
+            }
+        ])
+        tag_list = [{"tag": tag["_id"], "count": tag["count"]} for tag in tags]
+        return jsonify(tag_list), 200
+    except Exception as e:
+        print(f"Error fetching tag counts: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 """
 Forget and Reset Password
 """
-
 @app.route('/auth/forgot_password', methods=['POST'])
 def forgot_password():
     data = request.json
