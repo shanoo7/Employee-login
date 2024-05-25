@@ -17,6 +17,7 @@ const Stopwatch = () => {
   useEffect(() => {
     fetchProjects();
     fetchTags();
+    fetchEmployeeProjects(); // Fetch employee projects when component mounts
   }, []);
 
   const fetchProjects = async () => {
@@ -34,6 +35,17 @@ const Stopwatch = () => {
       setTags(response.data.tags.map(tag => ({ name: tag.tag, checked: false })));
     } catch (error) {
       console.error('Error fetching tags:', error);
+    }
+  };
+
+  const fetchEmployeeProjects = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/auth/get_employee_projects', { withCredentials: true });
+      const employeeProjects = response.data.projects;
+      // Assuming the employeeProjects data format is similar to the submittedDetails state
+      setSubmittedDetails(employeeProjects);
+    } catch (error) {
+      console.error('Error fetching employee projects:', error);
     }
   };
 
@@ -164,6 +176,7 @@ const Stopwatch = () => {
     const [hours, minutes, seconds] = timeString.split(":").map(Number);
     return (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
   };
+
 
   return (
     <>

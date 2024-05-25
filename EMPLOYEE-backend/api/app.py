@@ -87,6 +87,7 @@ class ProjectForm(FlaskForm):
     task = StringField('Task', validators=[DataRequired()])
     tags = StringField('Tags', validators=[DataRequired()])
     timeElapsed = DecimalField('Time Elapsed', validators=[DataRequired()])
+    empid = StringField('Employee ID', validators=[DataRequired()])
 
 class MeetingForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
@@ -134,7 +135,7 @@ class TagListView(ModelView):
     form = TagListForm
     
 class ProjectView(ModelView):
-    column_list = ('projectid', 'projectName', 'task', 'tags', 'timeElapsed')
+    column_list = ('projectid', 'projectName', 'task', 'tags', 'timeElapsed', 'empid')
     form = ProjectForm
 
 class EventView(ModelView):
@@ -147,7 +148,7 @@ admin.add_view(EmployeeDataView(db.emp_data, 'Employee Data'))
 admin.add_view(LeavesView(db.leaves, 'Leaves'))
 admin.add_view(ProjectListView(db.project_list, 'Project List'))
 admin.add_view(TagListView(db.tag_list, 'Tag List'))
-admin.add_view(ProjectView(db.projects, 'Projects'))
+admin.add_view(ProjectView(db.projects, 'Projects Details'))
 admin.add_view(EventView(db.events, 'Events'))
 admin.add_view(MeetingView(db.meeting, 'Meetings'))
 
@@ -498,28 +499,48 @@ def get_project_list():
 
 @app.route('/auth/add_project_data', methods=['POST'])
 def add_project_data():
+    print(f'Session contents: {session}')  # Debugging statement
+    if 'empid' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    empid = session['empid']
+    session['empid'] = empid
+    session.modified = True
+    print(f'Adding project data for empid: {empid}')  # This should print now
     data = request.json
     projectName = data.get('projectName')
-    task = data.get('task')  
-    tags = data.get('tags') 
+    task = data.get('task')
+    tags = data.get('tags')
     timeElapsed = data.get('timeElapsed')
-    
+
     # Generate projectid using ObjectId
     projectid = str(ObjectId())
 
     new_project = {
         'projectid': projectid,
+        'empid': empid,
         'projectName': projectName,
         'task': task,
         'tags': tags,
         'timeElapsed': timeElapsed
     }
     result = db.projects.insert_one(new_project)
-    
+
     if result.inserted_id:
         return jsonify({'message': 'Project data added successfully!', 'projectid': projectid}), 201
     else:
         return jsonify({'error': 'Failed to add project data.'}), 500
+
+@app.route('/auth/get_employee_projects', methods=['GET'])
+def get_employee_projects():
+    if 'empid' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    empid = session['empid']
+    projects = db.projects.find({'empid': empid})
+    project_list = [{'projectid': project['projectid'], 'projectName': project['projectName'], 'task': project['task'], 'tags': project['tags'], 'timeElapsed': project['timeElapsed']} for project in projects]
+
+    return jsonify({'projects': project_list}), 200
 
 @app.route('/auth/update_project_data/<index>', methods=['POST'])
 def update_project_data(index):
