@@ -1,39 +1,51 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Pie } from 'react-chartjs-2';
 
+const DonutChartComponent = () => {
+  const [tagData, setTagData] = useState([]);
 
-import React from 'react'
-import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
-import { CChartDoughnut } from '@coreui/react-chartjs'
+  useEffect(() => {
+    axios.get('https://employeelogin.vercel.app/auth/tag_list')
+      .then(response => {
+        setTagData(response.data.tags);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the tag data!', error);
+      });
+  }, []);
 
+  const tagCounts = tagData.reduce((acc, tag) => {
+    acc[tag] = (acc[tag] || 0) + 1;
+    return acc;
+  }, {});
 
-const Charts = () => {
-
-  const dummyData = {
-    labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
+  const data = {
+    labels: Object.keys(tagCounts),
     datasets: [
       {
-        backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-        data: [40, 20, 80, 10], // Dummy data
+        data: Object.values(tagCounts),
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40',
+        ],
+        hoverBackgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40',
+        ],
       },
     ],
   };
 
+  return <Pie data={data} />;
+};
 
-  return (
-    <CRow>
-      <CCol>
-        <CCard className="my-4">
-          <CCardHeader>Doughnut Chart</CCardHeader>
-          <CCardBody className='w-100'>
-            <CChartDoughnut className='w-50'
-              data={dummyData}
-            />
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
-  )
-}
-
-export default Charts
-
-//done
+export default DonutChartComponent;

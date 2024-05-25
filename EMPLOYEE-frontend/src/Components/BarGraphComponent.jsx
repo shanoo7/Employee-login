@@ -1,39 +1,34 @@
-import React from 'react'
-import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
-import {
-  CChartBar} from '@coreui/react-chartjs'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Bar } from 'react-chartjs-2';
 
+const BarGraphComponent = () => {
+  const [projectData, setProjectData] = useState([]);
 
-const Charts = () => {
-  const dummyData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  useEffect(() => {
+    axios.get('https://employeelogin.vercel.app/auth/get_employee_projects')
+      .then(response => {
+        setProjectData(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the project data!', error);
+      });
+  }, []);
+
+  const data = {
+    labels: projectData.map(project => project.name),
     datasets: [
       {
-        label: 'GitHub Commits',
-        backgroundColor: '#f87979',
-        data: [40, 20, 12, 39, 10, 40, 39], // Dummy data
+        label: 'Total Time Spent',
+        data: projectData.map(project => project.totalTime),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
       },
     ],
   };
 
-  return (
-    <CRow>
-   
-      <CCol>
-        <CCard className="my-4">
-          <CCardHeader>Bar Chart</CCardHeader>
-          <CCardBody className='w-100'>
-            <CChartBar className='w-100'
-              data={dummyData}
-              labels="months"
-            />
-          </CCardBody>
-        </CCard>
-      </CCol>
-  
-    </CRow>
-  )
-}
+  return <Bar data={data} />;
+};
 
-export default Charts
-//done
+export default BarGraphComponent;
