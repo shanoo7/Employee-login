@@ -181,21 +181,21 @@ const Stopwatch = () => {
   return (
     <>
       <div className="tw-flex tw-flex-col tw-items-center tw-p-4">
-        <div className="tw-mb-4 tw-border-2 tw-border-black tw-rounded tw-p-2 tw-flex tw-w-full">
+        <div className="tw-mb-4 tw-border-2 tw-border-base-content tw-rounded tw-p-2 tw-flex tw-w-full">
         <input
           type="text"
           placeholder="What are you working on?"
           value={task}
           onChange={(e) => setTask(e.target.value)}
           className="tw-border tw-border-gray-500 tw-px-2 tw-py-1 tw-mr-2 tw-flex-1 "
-          style={{ borderBottomRightRadius: 0, borderTopRightRadius: 0, color: 'black' }}
+          style={{ borderBottomRightRadius: 0, borderTopRightRadius: 0,  }}
         />
           <div className="tw-relative tw-flex-1">
             <select
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="tw-border tw-border-gray-500 tw-px-2 tw-py-1 tw-mr-2 tw-flex-1"
-              style={{color: 'black'}}
+             
             >
               <option value="">Select Project</option>
               {projects.map((project, index) => (
@@ -280,7 +280,7 @@ const Stopwatch = () => {
       </div>
 
       <div className="tw-p-4">
-        <table className="tw-mt-4 tw-border tw-border-collapse tw-w-full">
+        <table className="tw-mt-4 tw-border tw-border-base-content tw-w-full">
           <thead>
             <tr>
               <th className="tw-border tw-p-2 tw-w-1/5">Project Name</th>

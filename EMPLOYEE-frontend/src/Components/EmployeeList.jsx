@@ -17,31 +17,31 @@ const EmployeeList = () => {
   }, []);
 
   return (
-    <div className="mt-3">
-      <h2 className="text-center mb-3">Employee List</h2>
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Employee ID</th>
-            <th>Salary</th>
-            <th>Category</th>
+    <div className="tw-mt-3 tw-bg-transparent">
+    <h2 className="tw-text-center tw-mb-3">Employee List</h2>
+    <table className="tw-table tw-table-bordered  tw-bg-transparent">
+      <thead>
+        <tr className="tw-bg-transparent">
+          <th>Name</th>
+          <th>Email</th>
+          <th>Employee ID</th>
+          <th>Salary</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        {employees.map((employee, index) => (
+          <tr key={index} className="tw-bg-transparent">
+            <td>{employee.name}</td>
+            <td>{employee.email}</td>
+            <td>{employee.employee_id}</td>
+            <td>{employee.salary}</td>
+            <td>{employee.category}</td>
           </tr>
-        </thead>
-        <tbody>
-          {employees.map((employee, index) => (
-            <tr key={index}>
-              <td>{employee.name}</td>
-              <td>{employee.email}</td>
-              <td>{employee.employee_id}</td>
-              <td>{employee.salary}</td>
-              <td>{employee.category}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
+  </div>
   );
 };
 

@@ -70,7 +70,7 @@ const AddEmployee = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center mt-3 ">
-      <div className="p-3 rounded w-100 border">
+      <div className="p-3 rounded w-100 tw-border tw-border-base-content">
         <h2 className="text-center">Add Employee</h2>
         <br />
         {successMessage && (
@@ -86,7 +86,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="text"
-              className="form-control rounded-0"
+              className="form-control tw-placeholder-base-content rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               placeholder="Enter Name"
               value={employee.name}
               onChange={(e) => setEmployee({ ...employee, name: e.target.value })}
@@ -99,7 +99,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="email"
-              className="form-control rounded-0"
+              className="form-control tw-placeholder-base-content rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               id="inputEmail4"
               placeholder="Enter Email"
               autoComplete="off"
@@ -114,7 +114,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="text"
-              className="form-control rounded-0"
+              className="form-control tw-placeholder-base-content rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               id="inputEmployeeId"
               placeholder="Enter Employee ID"
               autoComplete="off"
@@ -129,7 +129,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="password"
-              className="form-control rounded-0"
+              className="form-control tw-placeholder-base-content rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               id="inputPassword4"
               placeholder="Enter password"
               value={employee.password}
@@ -143,7 +143,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="text"
-              className="form-control rounded-0"
+              className="form-control tw-placeholder-base-content rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               id="inputSalary"
               placeholder="Enter Salary"
               autoComplete="off"
@@ -168,7 +168,7 @@ const AddEmployee = () => {
             </label>
             <input
               type="file"
-              className="form-control rounded-0"
+              className="form-control rounded-0 tw-border tw-border-base-content tw-bg-base-300 tw-text-base-content"
               id="inputImage"
               accept="image/*"
               onChange={(e) => setEmployee({ ...employee, image: e.target.files[0] })}
